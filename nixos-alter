@@ -218,7 +218,7 @@ else
 fi
 
 if [ "$link" -eq 1 ]; then
-  ln -s "$pathToConfig" "$out"
+  ln -sTf "$pathToConfig" "$out"
 fi 
 
 if [ "$boot" -eq 1 ]; then
