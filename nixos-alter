@@ -204,7 +204,13 @@ fi
 if [ -z "$generation" ]; then
   echo "Building the system configuration..." >&2
 
-  pathToConfig="$(nix-build '<nixpkgs/nixos>' --no-out-link -A system)"
+  tmplink=$(mktemp -d)/result
+  nix build -f '<nixpkgs/nixos>' --out-link "$tmplink" system
+  if [ $? -eq 1 ]; then
+    echo "Something went wrong while building the system configuration."
+    exit 1
+  fi
+  pathToConfig=$(realpath "$tmplink")
 else
   echo "Selecting generation $generation" >&2
 
