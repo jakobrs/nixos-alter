@@ -280,6 +280,7 @@ done
 
 echo "Boot?                 $boot"                                >&2
 echo "Activate?             $activate"                            >&2
+echo "Modify?               $modify"                              >&2
 echo "Link?                 $link"                                >&2
 echo "Out:                  $out"                                 >&2
 echo "Profile:              $profile"                             >&2
