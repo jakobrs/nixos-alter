@@ -261,7 +261,7 @@ if [ -z "$generation" ]; then
     pathToConfig="$(realpath "$tmplink")"
   fi
 else
-  echo "Selecting generation $generation" >&2
+  echo "Selected generation $generation" >&2
 
   pathToConfig="$(realpath "$profile-$generation-link")"
 fi
