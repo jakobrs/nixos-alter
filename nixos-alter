@@ -34,7 +34,7 @@ EOF
   exit 1
 }
 
-extraBuildArgsOld=()
+extraBuildArgs=()
 boot=0
 activate=0
 link=0
