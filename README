@@ -16,13 +16,14 @@ nixos-alter
 -k --keep-going             Keep going
 
 -g --generation <n>         Use this generation instead of rebuilding
-   --no-rebuild             Don't rebuild (shorthand for --generation <current ceneration>)   [NYI]
+   --raw <path>             Use this store path instead of rebuilding
+   --no-rebuild             Don't rebuild (same as --generation <current ceneration>)
 
    --old-nix                Use nix-build instead of nix-command when building the system configuration
    --list-generations       List all generations
    --help                   Display usage information
 
-Note that, currently, --profile and --profile-name must occur before --list-generations or --no-rebuild.
+Note that, currently, --profile and --profile-name must occur before --list-generations, --generation or --no-rebuild.
 
 Abbreviations:
 

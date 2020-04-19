@@ -20,13 +20,14 @@ nixos-alter
 -k --keep-going             Keep going
 
 -g --generation <n>         Use this generation instead of rebuilding
-   --no-rebuild             Don't rebuild (shorthand for --generation <current ceneration>)   [NYI]
+   --raw <path>             Use this store path instead of rebuilding
+   --no-rebuild             Don't rebuild (same as --generation <current ceneration>)
 
    --old-nix                Use nix-build instead of nix-command when building the system configuration
    --list-generations       List all generations
    --help                   Display usage information
 
-Note that, currently, --profile and --profile-name must occur before --list-generations or --no-rebuild.
+Note that, currently, --profile and --profile-name must occur before --list-generations, --generation or --no-rebuild.
 
 Abbreviations:
 
@@ -44,7 +45,7 @@ activate=0
 link=0
 out=$PWD/result
 profile=/nix/var/nix/profiles/system
-generation=
+pathToConfig=
 old_nix=0
 
 while [ "$#" -gt 0 ]; do
@@ -239,12 +240,19 @@ while [ "$#" -gt 0 ]; do
         echo "$0: '--generation' requires an argument"
         exit 1
       fi
-      generation="$1"
+      pathToConfig=$(realpath "$profile-$1-link")
+      shift 1
+      ;;
+    --raw)
+      if [ -z "$1" ]; then
+        echo "$0: '--raw' requires an argument"
+        exit 1
+      fi
+      pathToConfig="$(realpath "$1")"
       shift 1
       ;;
     --no-rebuild)
-      echo "--no-rebuild is not yet implemented"
-      exit 1
+      pathToConfig=$(realpath "$profile")
       ;;
     --old-nix)
       old_nix=1
@@ -276,7 +284,7 @@ if [ "$boot" -eq 0 ] && [ "$activate" -eq 0 ] && [ "$link" -eq 0 ]; then
   exit 1
 fi
 
-if [ -z "$generation" ]; then
+if [ -z "$pathToConfig" ]; then
   echo "Building the system configuration..." >&2
 
   if [ -n "$old_nix" ]; then
@@ -296,9 +304,7 @@ if [ -z "$generation" ]; then
     pathToConfig="$(realpath "$tmplink")"
   fi
 else
-  echo "Selected generation $generation" >&2
-
-  pathToConfig="$(realpath "$profile-$generation-link")"
+  echo "Skipping rebuild" >&2
 fi
 
 if [ "$link" -eq 1 ]; then
