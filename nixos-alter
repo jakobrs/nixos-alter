@@ -13,6 +13,7 @@ nixos-alter
 -g --generation <n>       Use this generation instead of rebuilding
    --no-rebuild           Don't rebuild (shorthand for --generation <current ceneration>)   [NYI]
 
+   --old-nix              Use nix-build instead of nix-command when building the system configuration
    --list-generations List all generations
    --help             Display usage information
 
@@ -37,6 +38,8 @@ link=0
 out=$PWD/result
 profile=/nix/var/nix/profiles/system
 generation=
+
+old_nix=0
 
 while [ "$#" -gt 0 ]; do
   arg="$1"; shift 1
@@ -174,6 +177,9 @@ while [ "$#" -gt 0 ]; do
       generation="$1"
       shift 1
       ;;
+    --old-nix)
+      old_nix=1
+      ;;
     --list-generations)
       nix-env --list-generations -p "$profile"
       exit 1
@@ -204,13 +210,22 @@ fi
 if [ -z "$generation" ]; then
   echo "Building the system configuration..." >&2
 
-  tmplink=$(mktemp -d)/result
-  nix build -f '<nixpkgs/nixos>' --out-link "$tmplink" system
-  if [ $? -eq 1 ]; then
-    echo "Something went wrong while building the system configuration."
-    exit 1
+  if [ -n "$old_nix" ]; then
+    pathToConfig="$(nix-build '<nixpkgs/nixos>' --no-out-link -A system)"
+
+    if [ $? -eq 1 ]; then
+      echo "Something went wrong while building the system configuration."
+      exit 1
+    fi
+  else
+    tmplink="$(mktemp -d)/result"
+    nix build -f '<nixpkgs/nixos>' --out-link "$tmplink" system
+    if [ $? -eq 1 ]; then
+      echo "Something went wrong while building the system configuration."
+      exit 1
+    fi
+    pathToConfig="$(realpath "$tmplink")"
   fi
-  pathToConfig=$(realpath "$tmplink")
 else
   echo "Selecting generation $generation" >&2
 

@@ -9,6 +9,7 @@ nixos-alter
 -g --generation <n>       Use this generation instead of rebuilding
    --no-rebuild           Don't rebuild (shorthand for --generation <current ceneration>)   [NYI]
 
+   --old-nix              Use nix-build instead of nix-command when building the system configuration
    --list-generations List all generations
    --help             Display usage information
 
