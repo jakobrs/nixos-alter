@@ -17,14 +17,16 @@ nixos-alter
 
 -g --generation <n>         Use this generation instead of rebuilding
    --raw <path>             Use this store path instead of rebuilding
-   --no-rebuild             Don't rebuild (same as --generation <current ceneration>)
+   --current-generation     Same as --generation <current ceneration>
+   --booted-config          Same as --raw /run/booted-system
+   --current-config         Same as --raw /run/current-system
 
    --upgrade                Update the 'nixos' channel
    --old-nix                Use nix-build instead of nix-command when building the system configuration
    --list-generations       List all generations
    --help                   Display usage information
 
-Note that, currently, --profile and --profile-name must occur before --list-generations, --generation or --no-rebuild.
+Note that, currently, --profile and --profile-name must occur before --list-generations, --generation or --current-generation.
 
 Abbreviations:
 
