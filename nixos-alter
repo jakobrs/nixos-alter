@@ -12,8 +12,8 @@ nixos-alter
 -P --profile <path>         Path to the profile to use. Defaults to /nix/var/nix/profiles/system
 -p --profile-name <name>    Name of the profile to use. Mostly equivalent to --profile /nix/var/nix/profiles/system-profiles/<name>
 
--I --include <nix path>     Adds <nix path> to the Nix path
 -E --extra-build-arg <arg>  Extra argument to nix-build or nix build
+-I --include <nix path>     Adds <nix path> to the Nix path
    --show-trace             Show trace
 -j --max-jobs               Max jobs
 -K --keep-failed            Keep failed
@@ -203,14 +203,6 @@ while [ "$#" -gt 0 ]; do
       fi
       shift 1
       ;;
-    --include)
-      if [ -z "$1" ]; then
-        echo "$0: '--include' requires an argument"
-        exit 1
-      fi
-      extraBuildArgs+=(-I "$1")
-      shift 1
-      ;;
     --extra-build-arg)
       if [ -z "$1" ]; then
         echo "$0: '--extra-build-arg' requires an argument"
@@ -219,22 +211,16 @@ while [ "$#" -gt 0 ]; do
       extraBuildArgs+=("$1")
       shift 1
       ;;
-    --show-trace)
-      extraBuildArgs+=(--show-trace)
-      ;;
-    --max-jobs)
+    --include|--max-jobs)
       if [ -z "$1" ]; then
-        echo "$0: '--max-jobs' requires an argument"
+        echo "$0: '$arg' requires an argument"
         exit 1
       fi
-      extraBuildArgs+=(--max-jobs "$1")
+      extraBuildArgs+=("$arg" "$1")
       shift 1
       ;;
-    --keep-failed)
-      extraBuildArgs+=(--keep-failed)
-      ;;
-    --keep-going)
-      extraBuildArgs+=(--keep-going)
+    --show-trace|--keep-failed|--keep-going)
+      extraBuildArgs+=("$arg")
       ;;
     --generation)
       if [ -z "$1" ]; then
