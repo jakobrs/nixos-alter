@@ -10,6 +10,10 @@ nixos-alter
 
 -I --include <nix path>     Adds <nix path> to the Nix path
 -E --extra-build-arg <arg>  Extra argument to nix-build or nix build
+   --show-trace             Show trace
+-j --max-jobs               Max jobs
+-K --keep-failed            Keep failed
+-k --keep-going             Keep going
 
 -g --generation <n>         Use this generation instead of rebuilding
    --no-rebuild             Don't rebuild (shorthand for --generation <current ceneration>)   [NYI]

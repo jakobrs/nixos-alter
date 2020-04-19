@@ -14,6 +14,10 @@ nixos-alter
 
 -I --include <nix path>     Adds <nix path> to the Nix path
 -E --extra-build-arg <arg>  Extra argument to nix-build or nix build
+   --show-trace             Show trace
+-j --max-jobs               Max jobs
+-K --keep-failed            Keep failed
+-k --keep-going             Keep going
 
 -g --generation <n>         Use this generation instead of rebuilding
    --no-rebuild             Don't rebuild (shorthand for --generation <current ceneration>)   [NYI]
@@ -47,7 +51,7 @@ while [ "$#" -gt 0 ]; do
   arg="$1"; shift 1
 
   # Handling of one-letter args
-  if [[ "$arg" =~ ^-(b|a|l|o|p|P|I|E|g) ]]; then
+  if [[ "$arg" =~ ^-(b|a|l|o|p|P|I|E|j|K|k|g) ]]; then
     arg=${arg:1} # Remove the dash
 
     newArgs=()
@@ -105,6 +109,20 @@ while [ "$#" -gt 0 ]; do
             newArgs+=(--extra-build-arg)
           fi
           arg=
+          ;;
+        j)
+          if [ -n "$arg" ]; then
+            newArgs+=(--max-jobs "$arg")
+          else
+            newArgs+=(--max-jobs)
+          fi
+          arg=
+          ;;
+        K)
+          newArgs+=(--keep-failed)
+          ;;
+        k)
+          newArgs+=(--keep-going)
           ;;
         g)
           if [ -n "$arg" ]; then
@@ -198,6 +216,23 @@ while [ "$#" -gt 0 ]; do
       fi
       extraBuildArgs+=("$1")
       shift 1
+      ;;
+    --show-trace)
+      extraBuildArgs+=(--show-trace)
+      ;;
+    --max-jobs)
+      if [ -z "$1" ]; then
+        echo "$0: '--max-jobs' requires an argument"
+        exit 1
+      fi
+      extraBuildArgs+=(--max-jobs "$1")
+      shift 1
+      ;;
+    --keep-failed)
+      extraBuildArgs+=(--keep-failed)
+      ;;
+    --keep-going)
+      extraBuildArgs+=(--keep-going)
       ;;
     --generation)
       if [ -z "$1" ]; then
