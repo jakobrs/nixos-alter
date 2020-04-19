@@ -19,6 +19,7 @@ nixos-alter
    --raw <path>             Use this store path instead of rebuilding
    --no-rebuild             Don't rebuild (same as --generation <current ceneration>)
 
+   --upgrade                Update the 'nixos' channel
    --old-nix                Use nix-build instead of nix-command when building the system configuration
    --list-generations       List all generations
    --help                   Display usage information
