@@ -295,7 +295,7 @@ fi
 if [ -z "$pathToConfig" ]; then
   echo "Building the system configuration..." >&2
 
-  if [ -n "$old_nix" ]; then
+  if [ "$old_nix" -eq 1 ]; then
     pathToConfig="$(nix-build '<nixpkgs/nixos>' --no-out-link -A system "${extraBuildArgs[@]}")"
 
     if [ $? -eq 1 ]; then
