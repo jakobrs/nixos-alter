@@ -324,6 +324,11 @@ if [ "$modify" -eq 1 ] || [ "$boot" -eq 1 ]; then
   nix-env -p "$profile" --set "$pathToConfig"
 fi
 if [ "$boot" -eq 1 ]; then
+  if ! [[ "$profile" =~ ^/nix/var/nix/profiles ]]; then
+    echo "warning: It looks like you're trying to set the boot default to a profile"    >&2
+    echo "         that is not in /nix/var/nix/profiles. This is not something you're"  >&2
+    echo "         supposed to do."                                                     >&2
+  fi
   "$pathToConfig/bin/switch-to-configuration" boot
 fi
 if [ "$activate" -eq 1 ]; then
