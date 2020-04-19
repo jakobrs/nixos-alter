@@ -41,14 +41,13 @@ link=0
 out=$PWD/result
 profile=/nix/var/nix/profiles/system
 generation=
-
 old_nix=0
 
 while [ "$#" -gt 0 ]; do
   arg="$1"; shift 1
 
   # Handling of one-letter args
-  if [[ "$arg" =~ ^-(a|b|l|o|P|I|p|g) ]]; then
+  if [[ "$arg" =~ ^-(b|a|l|o|p|P|I|g) ]]; then
     arg=${arg:1} # Remove the dash
 
     newArgs=()
@@ -58,11 +57,11 @@ while [ "$#" -gt 0 ]; do
       arg=${arg:1}
 
       case "$argc" in
-        a)
-          newArgs+=(--activate)
-          ;;
         b)
           newArgs+=(--boot)
+          ;;
+        a)
+          newArgs+=(--activate)
           ;;
         l)
           newArgs+=(--link)
@@ -75,11 +74,11 @@ while [ "$#" -gt 0 ]; do
           fi
           arg=
           ;;
-        I)
+        p)
           if [ -n "$arg" ]; then
-            newArgs+=(--include "$arg")
+            newArgs+=(--profile-name "$arg")
           else
-            newArgs+=(--include)
+            newArgs+=(--profile-name)
           fi
           arg=
           ;;
@@ -91,11 +90,11 @@ while [ "$#" -gt 0 ]; do
           fi
           arg=
           ;;
-        p)
+        I)
           if [ -n "$arg" ]; then
-            newArgs+=(--profile-name "$arg")
+            newArgs+=(--include "$arg")
           else
-            newArgs+=(--profile-name)
+            newArgs+=(--include)
           fi
           arg=
           ;;
@@ -133,11 +132,11 @@ while [ "$#" -gt 0 ]; do
   fi
 
   case "$arg" in
-    --activate)
-      activate=1
-      ;;
     --boot)
       boot=1
+      ;;
+    --activate)
+      activate=1
       ;;
     --link)
       link=1
@@ -151,22 +150,6 @@ while [ "$#" -gt 0 ]; do
       link=1
       out=$(realpath -s $1)
 
-      shift 1
-      ;;
-    --include)
-      if [ -z "$1" ]; then
-        echo "$0: '--include' requires an argument"
-        exit 1
-      fi
-      extraBuildArgs+=(-I "$1")
-      shift 1
-      ;;
-    --extra-build-arg)
-      if [ -z "$1" ]; then
-        echo "$0: '--extra-build-arg' requires an argument"
-        exit 1
-      fi
-      extraBuildArgs+=("$1")
       shift 1
       ;;
     --profile)
@@ -192,9 +175,21 @@ while [ "$#" -gt 0 ]; do
       fi
       shift 1
       ;;
-    --no-rebuild)
-      echo "--no-rebuild is not yet implemented"
-      exit 1
+    --include)
+      if [ -z "$1" ]; then
+        echo "$0: '--include' requires an argument"
+        exit 1
+      fi
+      extraBuildArgs+=(-I "$1")
+      shift 1
+      ;;
+    --extra-build-arg)
+      if [ -z "$1" ]; then
+        echo "$0: '--extra-build-arg' requires an argument"
+        exit 1
+      fi
+      extraBuildArgs+=("$1")
+      shift 1
       ;;
     --generation)
       if [ -z "$1" ]; then
@@ -203,6 +198,10 @@ while [ "$#" -gt 0 ]; do
       fi
       generation="$1"
       shift 1
+      ;;
+    --no-rebuild)
+      echo "--no-rebuild is not yet implemented"
+      exit 1
       ;;
     --old-nix)
       old_nix=1
