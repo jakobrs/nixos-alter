@@ -156,7 +156,7 @@ while [ "$#" -gt 0 ]; do
       fi
 
       link=1
-      out=$(realpath -s $1)
+      out=$(realpath -s "$1")
 
       shift 1
       ;;
@@ -166,7 +166,7 @@ while [ "$#" -gt 0 ]; do
         exit 1
       fi
       if [ "$1" != system ]; then
-        profile=$(realpath -s $1)
+        profile=$(realpath -s "$1")
       fi
       shift 1
       ;;
@@ -236,7 +236,7 @@ echo "Profile:    $profile"                           >&2
 echo "Generation: $generation (empty means rebuild)"  >&2
 echo                                                  >&2
 
-if [ "$boot" -eq 0 -a "$activate" -eq 0 -a "$link" -eq 0 ]; then
+if [ "$boot" -eq 0 ] && [ "$activate" -eq 0 ] && [ "$link" -eq 0 ]; then
   echo error: You need to specify at least one of --boot, --activate and --link
   exit 1
 fi
