@@ -309,6 +309,7 @@ if [ -z "$pathToConfig" ]; then
       exit 1
     fi
     pathToConfig="$(realpath "$tmplink")"
+    rm "$tmplink"
   fi
 else
   echo "Skipping rebuild" >&2
