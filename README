@@ -18,7 +18,7 @@ nixos-alter
    --list-generations       List all generations
    --help                   Display usage information
 
-Note that, currently, --profile must occur before --list-generations or --no-rebuild.
+Note that, currently, --profile and --profile-name must occur before --list-generations or --no-rebuild.
 
 Abbreviations:
 
