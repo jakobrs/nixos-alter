@@ -271,13 +271,13 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-echo "Boot?       $boot"                              >&2
-echo "Activate?   $activate"                          >&2
-echo "Link?       $link"                              >&2
-echo "Out:        $out"                               >&2
-echo "Profile:    $profile"                           >&2
-echo "Generation: $generation (empty means rebuild)"  >&2
-echo                                                  >&2
+echo "Boot?                 $boot"                                >&2
+echo "Activate?             $activate"                            >&2
+echo "Link?                 $link"                                >&2
+echo "Out:                  $out"                                 >&2
+echo "Profile:              $profile"                             >&2
+echo "Store path of result: $pathToConfig (empty means rebuild)"  >&2
+echo                                                              >&2
 
 if [ "$boot" -eq 0 ] && [ "$activate" -eq 0 ] && [ "$link" -eq 0 ]; then
   echo error: You need to specify at least one of --boot, --activate and --link
