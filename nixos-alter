@@ -13,7 +13,7 @@ nixos-alter
 -p --profile-name <name>    Name of the profile to use. Mostly equivalent to --profile /nix/var/nix/profiles/system-profiles/<name>
 
 -I --include <nix path>     Adds <nix path> to the Nix path
-   --extra-build-arg <arg>  Extra argument to nix-build or nix build
+-E --extra-build-arg <arg>  Extra argument to nix-build or nix build
 
 -g --generation <n>         Use this generation instead of rebuilding
    --no-rebuild             Don't rebuild (shorthand for --generation <current ceneration>)   [NYI]
@@ -47,7 +47,7 @@ while [ "$#" -gt 0 ]; do
   arg="$1"; shift 1
 
   # Handling of one-letter args
-  if [[ "$arg" =~ ^-(b|a|l|o|p|P|I|g) ]]; then
+  if [[ "$arg" =~ ^-(b|a|l|o|p|P|I|E|g) ]]; then
     arg=${arg:1} # Remove the dash
 
     newArgs=()
@@ -95,6 +95,14 @@ while [ "$#" -gt 0 ]; do
             newArgs+=(--include "$arg")
           else
             newArgs+=(--include)
+          fi
+          arg=
+          ;;
+        E)
+          if [ -n "$arg" ]; then
+            newArgs+=(--extra-build-arg "$arg")
+          else
+            newArgs+=(--extra-build-arg)
           fi
           arg=
           ;;

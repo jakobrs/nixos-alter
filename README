@@ -9,7 +9,7 @@ nixos-alter
 -p --profile-name <name>    Name of the profile to use. Mostly equivalent to --profile /nix/var/nix/profiles/system-profiles/<name>
 
 -I --include <nix path>     Adds <nix path> to the Nix path
-   --extra-build-arg <arg>  Extra argument to nix-build or nix build
+-E --extra-build-arg <arg>  Extra argument to nix-build or nix build
 
 -g --generation <n>         Use this generation instead of rebuilding
    --no-rebuild             Don't rebuild (shorthand for --generation <current ceneration>)   [NYI]
