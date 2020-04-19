@@ -315,7 +315,7 @@ else
 fi
 
 if [ "$link" -eq 1 ]; then
-  ln -sTf "$pathToConfig" "$out"
+  nix-store --realise "$pathToConfig" --add-root "$out" --indirect
 fi 
 # Note that we don't allow --boot without --modify-profile
 if [ "$modify" -eq 1 ] || [ "$boot" -eq 1 ]; then
