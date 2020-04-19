@@ -60,15 +60,27 @@ while [ "$#" -gt 0 ]; do
           ;;
         o)
           if [ -n "$arg" ]; then
-            newArgs+=(--out $arg)
+            newArgs+=(--out "$arg")
           else
             newArgs+=(--out)
           fi
           arg=
           ;;
-        p|q)
-          echo nyi
-          exit 1
+        p)
+          if [ -n "$arg" ]; then
+            newArgs+=(--profile "$arg")
+          else
+            newArgs+=(--profile)
+          fi
+          arg=
+          ;;
+        g)
+          if [ -n "$arg" ]; then
+            newArgs+=(--generation "$arg")
+          else
+            newArgs+=(--generation)
+          fi
+          arg=
           ;;
       esac
     done
@@ -108,6 +120,10 @@ while [ "$#" -gt 0 ]; do
         profile=$(realpath -s $1)
       fi
       shift 1
+      ;;
+    --no-rebuild)
+      echo "--no-rebuild is not yet implemented"
+      exit 1
       ;;
     --generation)
       if [ -z "$1" ]; then
@@ -152,7 +168,7 @@ if [ -z "$generation" ]; then
 else
   echo "Selecting generation $generation" >&2
 
-  pathToConfig=$(realpath "$profile-$generation-link")
+  pathToConfig="$(realpath "$profile-$generation-link")"
 fi
 
 if [ "$link" -eq 1 ]; then
@@ -162,8 +178,8 @@ fi
 if [ "$boot" -eq 1 ]; then
   nix-env -p "$profile" --set "$pathToConfig"
 
-  $pathToConfig/bin/switch-to-configuration boot
+  "$pathToConfig/bin/switch-to-configuration" boot
 fi
 if [ "$activate" -eq 1 ]; then
-  $pathToConfig/bin/switch-to-configuration test
+  "$pathToConfig/bin/switch-to-configuration" test
 fi
