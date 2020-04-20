@@ -182,7 +182,7 @@ while [ "$#" -gt 0 ]; do
       ;;
     --out)
       if [ -z "$1" ]; then
-        echo "$0: '--out' requires an argument"
+        echo "$0: '--out' requires an argument" >&2
         exit 1
       fi
 
@@ -193,7 +193,7 @@ while [ "$#" -gt 0 ]; do
       ;;
     --profile)
       if [ -z "$1" ]; then
-        echo "$0: '--profile' requires an argument"
+        echo "$0: '--profile' requires an argument" >&2
         exit 1
       fi
       if [ "$1" != system ]; then
@@ -203,7 +203,7 @@ while [ "$#" -gt 0 ]; do
       ;;
     --profile-name)
       if [ -z "$1" ]; then
-        echo "$0: '--profile-name' requires an argument"
+        echo "$0: '--profile-name' requires an argument" >&2
         exit 1
       fi
       if [ "$1" == system ]; then
@@ -216,7 +216,7 @@ while [ "$#" -gt 0 ]; do
       ;;
     --extra-build-arg)
       if [ -z "$1" ]; then
-        echo "$0: '--extra-build-arg' requires an argument"
+        echo "$0: '--extra-build-arg' requires an argument" >&2
         exit 1
       fi
       extraBuildArgs+=("$1")
@@ -224,7 +224,7 @@ while [ "$#" -gt 0 ]; do
       ;;
     --include|--max-jobs)
       if [ -z "$1" ]; then
-        echo "$0: '$arg' requires an argument"
+        echo "$0: '$arg' requires an argument" >&2
         exit 1
       fi
       extraBuildArgs+=("$arg" "$1")
@@ -235,7 +235,7 @@ while [ "$#" -gt 0 ]; do
       ;;
     --generation)
       if [ -z "$1" ]; then
-        echo "$0: '--generation' requires an argument"
+        echo "$0: '--generation' requires an argument" >&2
         exit 1
       fi
       pathToConfig=$(realpath "$profile-$1-link")
@@ -243,7 +243,7 @@ while [ "$#" -gt 0 ]; do
       ;;
     --raw)
       if [ -z "$1" ]; then
-        echo "$0: '--raw' requires an argument"
+        echo "$0: '--raw' requires an argument" >&2
         exit 1
       fi
       pathToConfig="$(realpath "$1")"
@@ -272,7 +272,7 @@ while [ "$#" -gt 0 ]; do
       showHelp
       ;;
     *)
-      echo "$0: Argument '$arg' is not recognised"
+      echo "$0: Argument '$arg' is not recognised" >&2
       exit 1
       ;;
   esac
@@ -299,14 +299,14 @@ if [ -z "$pathToConfig" ]; then
     pathToConfig="$(nix-build '<nixpkgs/nixos>' --no-out-link -A system "${extraBuildArgs[@]}")"
 
     if [ $? -eq 1 ]; then
-      echo "Something went wrong while building the system configuration."
+      echo "Something went wrong while building the system configuration." >&2
       exit 1
     fi
   else
     tmplink="$(mktemp -d)/result"
     nix build -f '<nixpkgs/nixos>' --out-link "$tmplink" system "${extraBuildArgs[@]}"
     if [ $? -eq 1 ]; then
-      echo "Something went wrong while building the system configuration."
+      echo "Something went wrong while building the system configuration." >&2
       exit 1
     fi
     pathToConfig="$(realpath "$tmplink")"
@@ -318,6 +318,8 @@ fi
 
 if [ "$link" -eq 1 ]; then
   nix-store --realise "$pathToConfig" --add-root "$out" --indirect
+else
+  echo "$pathToConfig"
 fi 
 # Note that we don't allow --boot without --modify-profile
 if [ "$modify" -eq 1 ] || [ "$boot" -eq 1 ]; then
