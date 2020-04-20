@@ -279,8 +279,7 @@ while [ "$#" -gt 0 ]; do
 done
 
 if [ "$boot" -eq 0 ] && [ "$activate" -eq 0 ] && [ "$modify" -eq 0 ] && [ "$link" -eq 0 ]; then
-  echo error: You need to specify at least one of --boot, --activate, --modify-profile, and --link
-  exit 1
+  echo "warning: None of --boot, --activate, --modify-profile, and --link specified" >&2
 fi
 
 if [ -z "$pathToConfig" ]; then
