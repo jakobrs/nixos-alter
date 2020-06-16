@@ -326,7 +326,7 @@ if [ -z "$pathToConfig" ]; then
         exit 1
       fi
     else
-      nix build -f '<nixpkgs/nixos>' config.nix.package.out "${extraBuildArgs[@]}" -o "$tmpdir/nix"
+      nix build -f '<nixpkgs/nixos>' config.nix.package.out "${extraBuildArgs[@]}" --out-link "$tmpdir/nix"
       if [ $? -eq 1 ]; then
         echo "Something went wrong while building Nix." >&2
         exit 1
