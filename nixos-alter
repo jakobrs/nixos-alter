@@ -28,6 +28,8 @@ nixos-alter
 
    --upgrade                Update the 'nixos' channel
    --old-nix                Use nix-build instead of nix-command when building the system configuration
+   --no-rebuild-nix         Don't rebuild Nix
+   --fast                   Implies --show-trace and --no-rebuild-nix
    --list-generations       List all generations
    --help                   Display usage information
 
@@ -52,6 +54,8 @@ out=$PWD/result
 profile=/nix/var/nix/profiles/system
 pathToConfig=
 old_nix=0
+rebuild_nix=1
+tmpdir="$(mktemp -d)"
 
 while [ "$#" -gt 0 ]; do
   arg="$1"; shift 1
@@ -264,6 +268,13 @@ while [ "$#" -gt 0 ]; do
     --old-nix)
       old_nix=1
       ;;
+    --no-rebuild-nix)
+      rebuild_nix=0
+      ;;
+    --fast)
+      rebuild_nix=0
+      extraBuildArgs+=("--show-trace")
+      ;;
     --list-generations)
       nix-env --list-generations -p "$profile"
       exit 1
@@ -283,6 +294,28 @@ if [ "$boot" -eq 0 ] && [ "$activate" -eq 0 ] && [ "$modify" -eq 0 ] && [ "$link
 fi
 
 if [ -z "$pathToConfig" ]; then
+  if [ "$rebuild_nix" -eq 1 ]; then
+    echo "Building Nix..." >&2
+
+    if [ "$old_nix" -eq 1 ]; then
+      pathToNix="$(nix-build '<nixpkgs/nixos>' -A config.nix.package.out "${extraBuildArgs[@]}")"
+
+      if [ $? -eq 1 ]; then
+        echo "Something went wrong while building Nix." >&2
+        exit 1
+      fi
+    else
+      nix build -f '<nixpkgs/nixos>' config.nix.package.out "${extraBuildArgs[@]}" -o "$tmpdir/nix"
+      if [ $? -eq 1 ]; then
+        echo "Something went wrong while building Nix." >&2
+        exit 1
+      fi
+      pathToNix="$(realpath "$tmpdir/nix")"
+    fi
+
+    PATH="$pathToNix/bin:$PATH"
+  fi
+
   echo "Building the system configuration..." >&2
 
   if [ "$old_nix" -eq 1 ]; then
@@ -293,14 +326,12 @@ if [ -z "$pathToConfig" ]; then
       exit 1
     fi
   else
-    tmplink="$(mktemp -d)/result"
-    nix build -f '<nixpkgs/nixos>' --out-link "$tmplink" system "${extraBuildArgs[@]}"
+    nix build -f '<nixpkgs/nixos>' --out-link "$tmpdir/system" system "${extraBuildArgs[@]}"
     if [ $? -eq 1 ]; then
       echo "Something went wrong while building the system configuration." >&2
       exit 1
     fi
-    pathToConfig="$(realpath "$tmplink")"
-    rm "$tmplink"
+    pathToConfig="$(realpath "$tmpdir/system")"
   fi
 else
   echo "Skipping rebuild" >&2
@@ -326,3 +357,5 @@ fi
 if [ "$activate" -eq 1 ]; then
   "$pathToConfig/bin/switch-to-configuration" test
 fi
+
+rm -r "$tmpdir"
