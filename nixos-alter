@@ -339,6 +339,8 @@ fi
 
 if [ "$link" -eq 1 ]; then
   nix-store --realise "$pathToConfig" --add-root "$out" --indirect
+elif [ "$modify" -eq 1 ] || [ "$boot" -eq 1 ]; then
+  echo "$profile"
 else
   echo "$pathToConfig"
 fi 
