@@ -70,7 +70,7 @@ while [ "$#" -gt 0 ]; do
   arg="$1"; shift 1
 
   # Handling of one-letter args
-  if [[ "$arg" =~ ^-(b|a|m|l|D|o|p|P|I|c|E|j|K|k|g) ]]; then
+  if [[ "$arg" =~ ^-[^-] ]]; then
     arg=${arg:1} # Remove the dash
 
     newArgs=()
@@ -164,6 +164,10 @@ while [ "$#" -gt 0 ]; do
             newArgs+=(--generation)
           fi
           arg=
+          ;;
+        *)
+          echo "nixos-alter: Argument '-$argc' is not recognised" >&2
+          exit 1
           ;;
       esac
     done
