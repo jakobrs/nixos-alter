@@ -27,8 +27,10 @@ nixos-alter
    --current-generation     Same as --generation <current ceneration>
    --booted-config          Same as --raw /run/booted-system
    --current-config         Same as --raw /run/current-system
+-B --boot-default           Use the boot default instead of rebuilding
 
    --upgrade                Update the 'nixos' channel
+   --rewrite                After nixos-alter is finished, run \`nixos-alter rewrite\`
    --old-nix                Use nix-build instead of nix-command when building the system configuration
    --no-rebuild-nix         Don't rebuild Nix
    --fast                   Implies --show-trace and --no-rebuild-nix
@@ -45,6 +47,7 @@ test          --activate            -a
 boot          --boot                -b
 switch        --boot --activate     -ba
 build         --link                -l
+rewrite       --boot --boot-default -bB
 EOF
   exit 1
 }
@@ -60,13 +63,14 @@ profile=/nix/var/nix/profiles/system
 pathToConfig=
 old_nix=0
 rebuild_nix=1
+rewrite_after=0
 tmpdir="$(mktemp -d)"
 
 while [ "$#" -gt 0 ]; do
   arg="$1"; shift 1
 
   # Handling of one-letter args
-  if [[ "$arg" =~ ^-(b|a|m|l|D|o|p|P|I|E|j|K|k|g) ]]; then
+  if [[ "$arg" =~ ^-(b|a|m|l|D|o|p|P|I|E|j|K|k|g|B) ]]; then
     arg=${arg:1} # Remove the dash
 
     newArgs=()
@@ -153,13 +157,16 @@ while [ "$#" -gt 0 ]; do
           fi
           arg=
           ;;
+        B)
+          newArgs+=(--boot-default)
+          ;;
       esac
     done
 
     set -- "${newArgs[@]}" "$@"
 
     arg="$1"; shift 1
-  elif [[ "$arg" =~ ^(test|boot|switch|build)$ ]]; then
+  elif [[ "$arg" =~ ^(test|boot|switch|build|rewrite)$ ]]; then
     case "$arg" in
       test)
         set -- --activate "$@"
@@ -173,6 +180,8 @@ while [ "$#" -gt 0 ]; do
       build)
         set -- --link "$@"
         ;;
+      rewrite)
+        set -- --boot --boot-default "$@"
     esac
 
     arg="$1"; shift 1
@@ -273,8 +282,14 @@ while [ "$#" -gt 0 ]; do
     --current-config)
       pathToConfig=$(realpath /run/current-system)
       ;;
+    --boot-default)
+      pathToConfig=$(realpath /nix/var/nix/profiles/boot-default)
+      ;;
     --upgrade)
       nix-channel --update nixos
+      ;;
+    --rewrite)
+      rewrite_after=1
       ;;
     --old-nix)
       old_nix=1
@@ -382,3 +397,7 @@ if [ "$activate" -eq 1 ]; then
 fi
 
 rm -r "$tmpdir"
+
+if [ "$rewriteAfter" ]; then
+  /nix/var/nix/profiles/boot-default/bin/switch-to-configuration boot
+fi
