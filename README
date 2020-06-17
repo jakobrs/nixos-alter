@@ -13,6 +13,7 @@ nixos-alter
 
 -E --extra-build-arg <arg>  Extra argument to nix-build or nix build
 -I --include <nix path>     Adds <nix path> to the Nix path
+-c --channel <channel>      Like -I nixpkgs=<channel>, but the channel is referred to by name.
    --show-trace             Show trace
 -j --max-jobs               Max jobs
 -K --keep-failed            Keep failed

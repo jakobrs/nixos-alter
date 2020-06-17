@@ -17,6 +17,7 @@ nixos-alter
 
 -E --extra-build-arg <arg>  Extra argument to nix-build or nix build
 -I --include <nix path>     Adds <nix path> to the Nix path
+-c --channel <channel>      Like -I nixpkgs=<channel>, but the channel is referred to by name.
    --show-trace             Show trace
 -j --max-jobs               Max jobs
 -K --keep-failed            Keep failed
@@ -66,7 +67,7 @@ while [ "$#" -gt 0 ]; do
   arg="$1"; shift 1
 
   # Handling of one-letter args
-  if [[ "$arg" =~ ^-(b|a|m|l|D|o|p|P|I|E|j|K|k|g) ]]; then
+  if [[ "$arg" =~ ^-(b|a|m|l|D|o|p|P|I|c|E|j|K|k|g) ]]; then
     arg=${arg:1} # Remove the dash
 
     newArgs=()
@@ -120,6 +121,14 @@ while [ "$#" -gt 0 ]; do
             newArgs+=(--include "$arg")
           else
             newArgs+=(--include)
+          fi
+          arg=
+          ;;
+        c)
+          if [ -n "$arg" ]; then
+            newArgs+=(--channel "$arg")
+          else
+            newArgs+=(--channel)
           fi
           arg=
           ;;
@@ -243,6 +252,14 @@ while [ "$#" -gt 0 ]; do
         exit 1
       fi
       extraBuildArgs+=("$arg" "$1")
+      shift 1
+      ;;
+    --channel)
+      if [ -z "$1" ]; then
+        echo "$0: '--channel' requires an argument" >&2
+        exit 1
+      fi
+      extraBuildArgs+=("--include" "nixpkgs=$(nix-instantiate --find-file "$1")")
       shift 1
       ;;
     --show-trace|--keep-failed|--keep-going)
