@@ -66,6 +66,8 @@ old_nix=0
 rebuild_nix=1
 tmpdir="$(mktemp -d)"
 
+trap 'rm -r $tmpdir' EXIT
+
 while [ "$#" -gt 0 ]; do
   arg="$1"; shift 1
 
@@ -412,5 +414,3 @@ fi
 if [ "$activate" -eq 1 ]; then
   "$pathToConfig/bin/switch-to-configuration" test
 fi
-
-rm -r "$tmpdir"
