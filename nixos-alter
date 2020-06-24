@@ -25,9 +25,8 @@ nixos-alter
 -K --keep-failed            Keep failed
 -k --keep-going             Keep going
 
--g --generation <n>         Use this generation instead of rebuilding
+-g --generation <n>         Use this generation instead of rebuilding. Avoids creating duplicate generations.
    --raw <path>             Use this store path instead of rebuilding
-   --current-generation     Same as --generation <current ceneration>
    --booted-config          Same as --raw /run/booted-system
    --current-config         Same as --raw /run/current-system
 
@@ -40,7 +39,7 @@ nixos-alter
 
 --boot, --activate, --modify-profile, and --link conflict with --delete-profile.
 
-Note that, currently, --profile and --profile-name must occur before --list-generations, --generation or --current-generation.
+Note that, currently, --profile and --profile-name must occur before --list-generations.
 
 Abbreviations:
 
@@ -62,6 +61,7 @@ force=0
 out=$PWD/result
 profile=/nix/var/nix/profiles/system
 pathToConfig=
+generation=
 old_nix=0
 rebuild_nix=1
 tmpdir="$(mktemp -d)"
@@ -280,7 +280,7 @@ while [ "$#" -gt 0 ]; do
         echo "nixos-alter: '--generation' requires an argument" >&2
         exit 1
       fi
-      pathToConfig=$(realpath "$profile-$1-link")
+      generation="$1"
       shift 1
       ;;
     --raw)
@@ -290,9 +290,6 @@ while [ "$#" -gt 0 ]; do
       fi
       pathToConfig="$(realpath "$1")"
       shift 1
-      ;;
-    --current-generation)
-      pathToConfig=$(realpath "$profile")
       ;;
     --booted-config)
       pathToConfig=$(realpath /run/booted-system)
@@ -342,6 +339,9 @@ if [ "$boot" -eq 0 ] && [ "$activate" -eq 0 ] && [ "$modify" -eq 0 ] && [ "$link
   exit 1
 fi
 
+if [ -n "$generation" ]; then
+  pathToConfig=$(realpath "$profile-$generation-link")
+fi
 if [ -z "$pathToConfig" ]; then
   if [ "$rebuild_nix" -eq 1 ]; then
     echo "Building Nix..." >&2
@@ -395,7 +395,11 @@ else
 fi 
 # Note that we don't allow --boot without --modify-profile
 if [ "$modify" -eq 1 ] || [ "$boot" -eq 1 ]; then
-  nix-env -p "$profile" --set "$pathToConfig"
+  if [ -n "$generation" ]; then
+    nix-env -p "$profile" --switch-generation "$generation"
+  else
+    nix-env -p "$profile" --set "$pathToConfig"
+  fi
 fi
 if [ "$boot" -eq 1 ]; then
   if ! [[ "$profile" =~ ^/nix/var/nix/profiles ]]; then
