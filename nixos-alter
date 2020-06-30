@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 showHelp() {
-  cat <<EOF
+  less -F <<EOF
 nixos-alter
 
 -b --boot                   Make the boot default. Implies --modify-profile
